@@ -1,0 +1,104 @@
+//This is a rough rough ROUGH and entirely unfinished outline of fight AI
+
+/**Presumptions:
+class named Character that stores all our character stats
+method called TakeTurn() that determines what the character does on their turn
+
+
+idea:
+use a strategy pattern, pass the character class through the strategy class which uses a series of ifelse statements to determine AI behaviour
+can have three strategies, Aggressive, Balanced, Defensive
+
+example:**/
+
+public abstract class Combat Strategy{
+  \\This is the class that the character passes through, this is an
+  \\abstract class mainly used to get the character class into the
+  \\other strategy classes
+ 
+  \\data values
+  public Character Character {get; set;}
+  public abstract void TakeTurn();
+}
+
+public class AggressiveStrategy : CombatStrategy{
+  \\the aggressive strategy inherits CombatStrategy
+  \\this strategy picks the highest damage attack and does it
+
+  public override void TakeTurn(){
+    \\this is where all the logic goes about choosing the best attack
+    \\filling this with pseudo code until we actually get our methods and such written out
+    if (Character.element > Opponent.element){
+      use strongest attack
+    }
+    else if (Character.element == Opponent.element){
+      use some other attack
+    }
+    else { \\(Character.element < Opponent.element)
+      find a way to hurt them
+    }
+  }
+}
+
+public class BalancedStrategy : CombatStrategy{
+  \\this strat inherits CombatStrategy
+  \\this strat does a balance of offensive/defensive abilities
+
+  public override void TakeTurn(){
+    \\fight logic, tries to balance offense/defense, would decide what to do based on HP
+    \\pseudo-code
+    if (Character.HP > 75){
+      if (Character.element > Opponent.element){
+        use strongest attack
+      }
+      else if (Character.element == Opponent.element){
+        use some other attack
+      }
+      else { \\(Character.element < Opponent.element)
+        find a way to hurt them
+      }
+    else if (Character.HP <= 75) and (Character.Inventory has healing potion){
+      Character.use(healing potion)
+    }
+    else if (Character.HP <= 75) and (Character.Spells has heal spell){
+      Character.cast(heal spell)
+    }
+    else if (Character.HP <= 75){
+      Character.use defensive option
+    }
+    else {
+      perform an attack
+    }
+    \\this can be expanded upon
+  }
+}
+
+public class DefensiveStrategy : CombatStrategy{
+  \\this strat inherits CombatStrategy
+  \\this strat tries to keep you alive for as long as possible
+  \\only attacks if HP is above 90%
+
+  public override void TakeTurn(){
+    \\fight logic, tries to keep HP maxed out
+    \\pseudo-code
+    if (Character.HP >= 90){
+      if (Character.element > Opponent.element){
+        use strongest attack
+      }
+      else if (Character.element == Opponent.element){
+        use some other attack
+      }
+      else { \\(Character.element < Opponent.element)
+        find a way to hurt them
+      }
+    else if (Character.HP < 90) and (Character.Inventory has healing potion){
+      Character.use(healing potion)
+    }
+    else if (Character.HP < 90) and (Character.Spells has heal spell){
+      Character.cast(heal spell)
+    }
+    else {
+      Character.use defensive option
+    }
+  }
+}
