@@ -23,9 +23,9 @@ public class MainMenuButton : MonoBehaviour
         {
             SceneManager.LoadScene("TurnBasedCombat");
         }
-        else if (button.CompareTo("Char Button") == 0)
+        else if (button.CompareTo("Settings Button") == 0)
         {
-            SceneManager.LoadScene("CharMenu");
+            SceneManager.LoadScene("SettingsMenu");
         }
         else if (button.CompareTo("Leader Button") == 0)
         {
