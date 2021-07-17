@@ -13,9 +13,12 @@ public class PlayerAggressiveStrategy : CombatStrategy{
   public override void TakeTurn(PlayerCharacter player, EnemyCharacter enemy){
 	if (player.health > 0){
 		if (enemy.mana >= 10){
-			enemy.Ult()
+			enemy.Ult();
 		}
 		else {
-			player.Attack()
+			player.Attack();
 		}
+	Else {
+		SceneManager.LoadScene("MainMenu");
+	     }
 	}		
