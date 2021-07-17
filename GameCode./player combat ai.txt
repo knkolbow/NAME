@@ -34,79 +34,9 @@ public class PlayerAggressiveStrategy : CombatStrategy{
 		else {
 			player.Attack()
 		}
-	}		
+	Else{
+		enemyscript.charReset()
+	}
+	}
 	
-    /**if (player.element > enemy.element){
-      use strongest attack
-    }
-    else if (player.element == enemy.element){
-      use some other attack
-    }
-    else { \\(player.element < enemy.element)
-      find a way to hurt them
-    }
-  }**/
-}
-
-public class BalancedStrategy : CombatStrategy{
-  \\this strat inherits CombatStrategy
-  \\this strat does a balance of offensive/defensive abilities
-
-  public override void TakeTurn(PlayerCharacter player, EnemyCharacter enemy){
-    \\fight logic, tries to balance offense/defense, would decide what to do based on HP
-    \\pseudo-code
-    if (((double)player.health / player.MaxHealth) > 0.75){
-      if (player.element > enemy.element){
-        use strongest attack
-      }
-      else if (player.element == enemy.element){
-        use some other attack
-      }
-      else if (player.element < enemy.element)
-        find a way to hurt them
-      }
-    else if (((double)player.health / player.MaxHealth) <= 0.75) and (player.Inventory has healing potion){
-      player.use(healing potion)
-    }
-    else if (((double)player.health / player.MaxHealth) <= 0.75) and (player.Spells has heal spell){
-      player.cast(heal spell)
-    }
-    else if (((double)player.health / player.MaxHealth) <= 0.75){
-      player.use defensive option
-    }
-    else {
-      perform an attack
-    }
-    \\this can be expanded upon
-  }
-}
-
-public class DefensiveStrategy : CombatStrategy{
-  \\this strat inherits CombatStrategy
-  \\this strat tries to keep you alive for as long as possible
-  \\only attacks if HP is above 90%
-
-  public override void TakeTurn(PlayerCharacter player, EnemyCharacter enemy){
-    \\fight logic, tries to keep HP maxed out
-    \\pseudo-code
-    if (((double)player.health / player.MaxHealth) < 0.90){
-      if (player.element > enemy.element){
-        use strongest attack
-      }
-      else if (player.element == enemy.element){
-        use some other attack
-      }
-      else { \\(player.element < enemy.element)
-        find a way to hurt them
-      }
-    else if ((player.health / player.MaxHealth) < 0.90) and player.Inventory has healing potion){
-      player.use(healing potion)
-    }
-    else if ((player.health / player.MaxHealth) < 0.90) and player.Spells has heal spell){
-      player.cast(heal spell)
-    }
-    else {
-      player.use defensive option
-    }
-  }
-}
+   
