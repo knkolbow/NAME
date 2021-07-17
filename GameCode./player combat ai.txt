@@ -13,16 +13,16 @@ public class PlayerAggressiveStrategy : CombatStrategy{
   public override void TakeTurn(PlayerCharacter player, EnemyCharacter enemy){
 	if (enemy.health > 0){
 		if (player.mana >= 9){
-			player.Ult()
+			player.Ult();
 		}
 		else if (player.mana >= 6){
-			player.Fire()
+			player.Fire();
 		}
 		else {
-			player.Attack()
+			player.Attack();
 		}
 	Else{
-		enemyscript.charReset()
+		enemyscript.charReset();
 	    }
 	}
 	
