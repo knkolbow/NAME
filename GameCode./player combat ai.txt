@@ -1,16 +1,3 @@
-//This is a rough rough ROUGH and entirely unfinished outline of fight AI
-
-/**Presumptions:
-class named Character that stores all our character stats
-method called TakeTurn() that determines what the character does on their turn
-
-
-idea:
-use a strategy pattern, pass the character class through the strategy class which uses a series of ifelse statements to determine AI behaviour
-can have three strategies, Aggressive, Balanced, Defensive
-
-example:**/
-
 public abstract class PlayerCombatStrategy{
   \\This is the class that the character passes through, this is an
   \\abstract class mainly used to get the character class into the
@@ -36,7 +23,7 @@ public class PlayerAggressiveStrategy : CombatStrategy{
 		}
 	Else{
 		enemyscript.charReset()
-	}
+	    }
 	}
 	
    
