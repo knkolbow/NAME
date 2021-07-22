@@ -1,14 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
 public abstract class EnemyCombatStrategy{
-  \\This is the class that the character passes through, this is an
-  \\abstract class mainly used to get the character class into the
-  \\other strategy classes
+  //This is the class that the character passes through, this is an
+  //abstract class mainly used to get the character class into the
+  //other strategy classes
  
   public abstract void TakeTurn(PlayerCharacter player, EnemyCharacter enemy);
 }
 
-public class PlayerAggressiveStrategy : CombatStrategy{
-  \\the aggressive strategy inherits CombatStrategy
-  \\this strategy picks the highest damage attack and does it
+public class EnemyAggressiveStrategy : EnemyCombatStrategy{
+  //the aggressive strategy inherits CombatStrategy
+  //this strategy picks the highest damage attack and does it
 
   public override void TakeTurn(PlayerCharacter player, EnemyCharacter enemy){
 	if (player.health > 0){
@@ -16,9 +21,8 @@ public class PlayerAggressiveStrategy : CombatStrategy{
 			enemy.Ult();
 		}
 		else {
-			player.Attack();
+			enemy.Attack();
 		}
-	Else {
-		SceneManager.LoadScene("MainMenu");
-	     }
-	}		
+	}
+  }
+}
