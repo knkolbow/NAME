@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Firebase.Auth;
+using Firebase.Database;
 
 public class EnemyCharacter : MonoBehaviour
 {
     private TMP_Text healthText;
     public int maxHealth;
     public int health;
-    public int level = 1;
+    public int level;
     public int mana;
     private int attack;
     public int speed;
@@ -19,9 +21,15 @@ public class EnemyCharacter : MonoBehaviour
     EnemyCharacter enemyscript;
     PlayerCharacter playerscript;
     CombatControlScript controlscript;
+    DatabaseReference DBreference;
+    string userId;
+    
     // Start is called before the first frame update
     void Start()
     {
+        // Get database reference
+        userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        DBreference = FirebaseDatabase.DefaultInstance.RootReference;
         //Enemy max health
         maxHealth = 15;
         //Enemy starting health
@@ -30,6 +38,8 @@ public class EnemyCharacter : MonoBehaviour
         mana = 0;
         //enemy possible damage
         attack = 4;
+        //Match enemy and player levels
+        level = PlayerCharacter.level;
         //get active game objects and their needed scripts
         //Objects tags are checked and then scripts are pulled from those objects
         enemyChar = GameObject.FindGameObjectWithTag("EnemyChar");
@@ -39,7 +49,6 @@ public class EnemyCharacter : MonoBehaviour
         enemyscript = enemyChar.GetComponent<EnemyCharacter>();
         controlscript = combatController.GetComponent<CombatControlScript>();
         
-        //get player level?
     }//end start method
    
     // Update is called once per frame
@@ -51,6 +60,10 @@ public class EnemyCharacter : MonoBehaviour
         //when enemy health hits 0 reset or "spawn" a new enemy
         if (health <= 0)
         {
+            // add to player kills
+            PlayerCharacter.kills += 1;
+            StartCoroutine(UpdateKills(PlayerCharacter.kills));
+            
             enemyscript.charReset(); 
         }
         
@@ -114,4 +127,24 @@ public class EnemyCharacter : MonoBehaviour
             
         }
     }//end ult method
+    
+        // Updates kills in database
+       private IEnumerator UpdateKills(int kills)
+    {
+        //Set the currently logged in user kills
+        var DBTask = DBreference.Child("users").Child(userId).Child("kills").SetValueAsync(kills);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Kills are now updated
+        }
+    }
+    
+    
 }
