@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Firebase;
+using Firebase.Database;
+using Firebase.Auth;
 
 public class PlayerCharacter : MonoBehaviour
 {
@@ -10,7 +13,6 @@ public class PlayerCharacter : MonoBehaviour
     public int health;
     public int maxHealth;
     public int mana;
-    static public int level = 1;
     int attack;
     public int speed;
     private TMP_Text healthText;
@@ -24,9 +26,20 @@ public class PlayerCharacter : MonoBehaviour
     EnemyCharacter enemyscript;
     PlayerCharacter playerscript;
     CombatControlScript controlscript;
+    //Database reference and variables
+    DatabaseReference DBreference;
+    string userId;
+    static public int level;
+    static public int kills;
+    static public int deaths;
+    
     // Start is called before the first frame update
     void Start()
     {
+        // Get current players data
+        userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        DBreference = FirebaseDatabase.DefaultInstance.RootReference;
+        StartCoroutine(GetUserData());
         //Player max health
         maxHealth = 20;
         //amount of possible damage
@@ -106,6 +119,12 @@ public class PlayerCharacter : MonoBehaviour
     //player level up sequence
    void levelUp()
     {
+        //increase level by 1 up until level 4
+        if (level < 4)
+        {
+            level += 1;
+            StartCoroutine(UpdateLevel(level));
+        }
         //increase level by 1
         level += 1;
         //check if level is below level cap for stat boost
@@ -131,6 +150,44 @@ public class PlayerCharacter : MonoBehaviour
         //increase mana by 3 upon level up
         mana += 3;
     }//end levelup function
+    
+        private IEnumerator GetUserData()
+    {
+        //Get the currently logged in user data
+        var DBTask = DBreference.Child("users").Child(userId).GetValueAsync();
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Data has been retrieved
+            DataSnapshot snapshot = DBTask.Result;
+            level = int.Parse(snapshot.Child("level").Value.ToString());
+            kills = int.Parse(snapshot.Child("kills").Value.ToString());
+            deaths = int.Parse(snapshot.Child("deaths").Value.ToString());
+        }
+    }
+
+    private IEnumerator UpdateLevel(int newLevel)
+    {
+        //Set the currently logged in user level
+        var DBTask = DBreference.Child("users").Child(userId).Child("level").SetValueAsync(newLevel);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //level is now updated
+        }
+    }
 
     
 }
