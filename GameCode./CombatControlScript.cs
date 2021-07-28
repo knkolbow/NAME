@@ -12,9 +12,16 @@ public class CombatControlScript : MonoBehaviour
     PlayerCharacter playerscript;
     public bool playerturn;
     
+    // database reference
+    string userId;
+    DatabaseReference DBreference;
+    
     // Start is called before the first frame update
     void Start()
     {
+        // database reference
+        userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        DBreference = FirebaseDatabase.DefaultInstance.RootReference;
         //set object and script variables
         enemyChar = GameObject.FindGameObjectWithTag("EnemyChar");
         playerChar = GameObject.FindGameObjectWithTag("PlayerChar");
@@ -56,7 +63,28 @@ public class CombatControlScript : MonoBehaviour
         //plan to use a game over/save screen instead.
         if(playerscript.health <= 0)
         {
+            // Update player deaths
+            PlayerCharacter.deaths += 1;
+            StartCoroutine(UpdateDeaths(PlayerCharacter.deaths));
             SceneManager.LoadScene("MainMenu");
+        }
+    }
+    
+    
+        IEnumerator UpdateDeaths(int deaths)
+    {
+        //Set the currently logged in user deaths
+        var DBTask = DBreference.Child("users").Child(userId).Child("deaths").SetValueAsync(deaths);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Deaths are now updated
         }
     }
 }
