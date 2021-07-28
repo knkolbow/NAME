@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Firebase.Database;
+using Firebase.Auth;
 
 public class CombatControlScript : MonoBehaviour
 {
