@@ -128,6 +128,19 @@ public class EnemyCharacter : MonoBehaviour
         }
     }//end ult method
     
+    //enemy AI method
+    public void enemyTakeTurn()
+	{
+		if (playerscript.health > 0){
+			if (enemyscript.mana >= 10){
+				enemyscript.Ult();
+			}
+			else {
+				enemyscript.Attack();
+			}
+		}
+	}//end AI method
+    
         // Updates kills in database
        private IEnumerator UpdateKills(int kills)
     {
