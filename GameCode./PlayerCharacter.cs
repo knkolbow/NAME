@@ -96,6 +96,25 @@ public class PlayerCharacter : MonoBehaviour
             controlscript.playerturn = false;
         }
     }//end ult function
+    
+    
+    //player AI function
+    public void playerTakeTurn()
+	{
+		if (enemyscript.health > 0){
+			if (playerscript.mana >= 9){
+				playerscript.Ult();
+			}
+			else if (playerscript.mana >= 6){
+				playerscript.Fire();
+			}
+			else {
+				playerscript.Attack();
+			}
+		}
+	}//end AI function
+    
+    
 
 
     void Update()
