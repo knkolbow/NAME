@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Threading;
 using Firebase.Database;
 using Firebase.Auth;
 
@@ -30,7 +31,8 @@ public class CombatControlScript : MonoBehaviour
         playerscript = playerChar.GetComponent<PlayerCharacter>();
         enemyscript = enemyChar.GetComponent<EnemyCharacter>();
         //start with player turn
-        playerturn = true;  
+        playerturn = true;
+        combatAI = false;
     }
 
     // Update is called once per frame
@@ -43,24 +45,23 @@ public class CombatControlScript : MonoBehaviour
             //give player and enemy 1 mana
             playerscript.mana += 1;
             enemyscript.mana += 1;
-            //need some way to pause actions here
-            //currently enemy moves at a frame after the player, need a clear break, will look for fixes
-            //checks if enemy has 10 or more mana
-            if (enemyscript.mana >= 10)
-            {
-                //removes 10 mana and uses enemy ult
-                enemyscript.mana -= 10;
-                enemyscript.Ult();
-            }
-            //if less than 10 mana enemy does simple attack
-            else
-            {
-                enemyscript.Attack();
-            }
-            //need some way to pause actions here
-            //currently enemy moves at a frame after the player, need a clear break, will look for fixes
+
+			
+            //the enemy takes his turn based on the function in EnemyCharacter
+            //can put Thread.Pause(300) here if needed
+			enemyscript.enemyTakeTurn();
+
+            //after enemy turn is complete, set playerturn to true
             playerturn = true;
         }
+        //if combatAI is true, run through the player's turn
+        else if (combatAI == true)
+		{
+            //player takes turn based on class in PlayerCharacter
+			playerscript.playerTakeTurn();
+			Thread.Sleep(300); //after AI takes turn, pause for 3 seconds
+		}
+        
         //when player runs out of health goes back to main menu
         //plan to use a game over/save screen instead.
         if(playerscript.health <= 0)
