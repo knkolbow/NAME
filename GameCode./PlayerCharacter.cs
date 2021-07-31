@@ -32,6 +32,7 @@ public class PlayerCharacter : MonoBehaviour
     static public int level;
     static public int kills;
     static public int deaths;
+    static public int highscore;
     
     // Start is called before the first frame update
     void Start()
@@ -143,6 +144,9 @@ public class PlayerCharacter : MonoBehaviour
         {
             level += 1;
             StartCoroutine(UpdateLevel(level));
+	    highscore += 10;
+            StartCoroutine(UpdateHighscore(highscore));
+            UpdateDatabase();
         }
         //increase level by 1
         level += 1;
@@ -185,9 +189,23 @@ public class PlayerCharacter : MonoBehaviour
         {
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
+	    username = snapshot.Child("username").Value.ToString();
+            highscore = int.Parse(snapshot.Child("highscore").Value.ToString());
             level = int.Parse(snapshot.Child("level").Value.ToString());
             kills = int.Parse(snapshot.Child("kills").Value.ToString());
             deaths = int.Parse(snapshot.Child("deaths").Value.ToString());
+        }
+    }
+    
+    
+    private IEnumerator UpdateHighscore(int newScore)
+    {
+        //Set the currently logged in user level
+        var DBTask = DBreference.Child("users").Child(userId).Child("highscore").SetValueAsync(newScore);
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
         }
     }
 
@@ -207,6 +225,40 @@ public class PlayerCharacter : MonoBehaviour
             //level is now updated
         }
     }
+    
+    
+     private void UpdateDatabase()    // Update the players in each level
+    {
+        if (level == 2)
+        {   // Remove player from level one table
+            DBreference.Child("levelone").Child(userId).Child("username").RemoveValueAsync();
+            DBreference.Child("levelone").Child(userId).RemoveValueAsync();
+
+            // Add player to level two table
+            DBreference.Child("leveltwo").Child(userId);
+            DBreference.Child("leveltwo").Child(userId).Child("username").SetValueAsync(username);
+        }
+        if (level == 3)
+        {   // Remove player from level two table
+            DBreference.Child("leveltwo").Child(userId).Child("username").RemoveValueAsync();
+            DBreference.Child("leveltwo").Child(userId).RemoveValueAsync();
+
+            // Add player to level three table
+            DBreference.Child("levelthree").Child(userId);
+            DBreference.Child("levelthree").Child(userId).Child("username").SetValueAsync(username);
+        }
+        if (level == 4)
+        {
+            // Remove player from level three table
+            DBreference.Child("levelthree").Child(userId).Child("username").RemoveValueAsync();
+            DBreference.Child("levelthree").Child(userId).RemoveValueAsync();
+
+            // Add player to level four table
+            DBreference.Child("levelfour").Child(userId);
+            DBreference.Child("levelfour").Child(userId).Child("username").SetValueAsync(username);
+        }
+    }
+    
 
     
 }
