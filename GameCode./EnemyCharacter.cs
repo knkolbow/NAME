@@ -63,7 +63,10 @@ public class EnemyCharacter : MonoBehaviour
             // add to player kills
             PlayerCharacter.kills += 1;
             StartCoroutine(UpdateKills(PlayerCharacter.kills));
-            
+            PlayerCharacter.highscore += 5;
+            StartCoroutine(UpdateHighscore(PlayerCharacter.highscore));
+	    
+	    //reset enemy
             enemyscript.charReset(); 
         }
         
@@ -159,5 +162,15 @@ public class EnemyCharacter : MonoBehaviour
         }
     }
     
+        private IEnumerator UpdateHighscore(int newScore)
+    {
+        //Set the currently logged in user level
+        var DBTask = DBreference.Child("users").Child(userId).Child("highscore").SetValueAsync(newScore);
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+    }
     
 }
