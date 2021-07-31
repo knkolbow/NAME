@@ -5,6 +5,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using System.Linq;
+using System;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class FirebaseManager : MonoBehaviour
     public static FirebaseAuth auth;
     public static FirebaseUser user;
     public DatabaseReference DBreference;
+    public DatabaseReference database;
+    public string username;
 
     // Login Data Fields
     public TMP_InputField loginEmail;
@@ -70,28 +73,30 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(CheckAutoLogin());       // Checks if player is already logged in
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
-        DBreference = FirebaseDatabase.DefaultInstance.RootReference; // Connects to database
+        DBreference = FirebaseDatabase.DefaultInstance.RootReference;   // Connects to database
     }
 
     // Checks if user is already logged in
     private IEnumerator CheckAutoLogin()
     {
         yield return new WaitForEndOfFrame();
-        if(user != null)
+        if (user != null)
         {
             var reloadUserTask = user.ReloadAsync();
             yield return new WaitUntil(predicate: () => reloadUserTask.IsCompleted);
             AutoLogin();
-        }   
+        }
     }
 
     private void AutoLogin()
     {
         if (user != null)
         {
-            //If user is logged in go straight to main menu.
+            //If user is logged in go straight to main menu and set user to active
+            DBreference.Child("users").Child(user.UserId).Child("active").SetValueAsync("true");
+            DBreference.Child("users").Child(user.UserId).Child("lastLogedIn").SetValueAsync(DateTime.Now.ToString());
             GameManager.instance.ChangeScene(1);
-        }    
+        }
     }
 
     void AuthStateChanged(object sender, System.EventArgs eventArgs)
@@ -110,11 +115,11 @@ public class FirebaseManager : MonoBehaviour
             }
         }
     }
-    void OnDestroy()
+/*    void OnDestroy()
     {
         auth.StateChanged -= AuthStateChanged;
         auth = null;
-    }
+    }*/
 
     public void ResetLoginFields()
     {
@@ -135,13 +140,13 @@ public class FirebaseManager : MonoBehaviour
     public void LoginButton()
     {
         StartCoroutine(LoginLogic(loginEmail.text, loginPassword.text));
-
     }
-    
+
     // Registers user
     public void RegisterButton()
     {
         StartCoroutine(Register(registerEmail.text, registerPassword.text));
+        
     }
 
     // Takes you to the register screen
@@ -164,7 +169,7 @@ public class FirebaseManager : MonoBehaviour
         var loginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
 
         yield return new WaitUntil(predicate: () => loginTask.IsCompleted);
-       
+
         if (loginTask.Exception != null)
         {
             //If there are errors handle them
@@ -200,6 +205,8 @@ public class FirebaseManager : MonoBehaviour
             loginOutputText.text = "Signed In";
             user = loginTask.Result;
             Debug.LogFormat("User signed in successfully: {0} ({1})", user.DisplayName, user.Email);
+            DBreference.Child("users").Child(user.UserId).Child("active").SetValueAsync("true");
+            DBreference.Child("users").Child(user.UserId).Child("lastLogedIn").SetValueAsync(DateTime.Now.ToString());
 
             yield return new WaitForSeconds(1);
             GameManager.instance.ChangeScene(1);
@@ -263,8 +270,10 @@ public class FirebaseManager : MonoBehaviour
                 if (user != null)
                 {
                     //Create a user profile and set the username
-                    UserProfile profile = new UserProfile{DisplayName = _email};
+                    username = _email.Substring(0, _email.IndexOf("@"));
                     string userId = user.UserId;
+                    UserProfile profile = new UserProfile { DisplayName = username };
+                   
                     //Call the Firebase auth update user profile function passing the profile with the username
                     var ProfileTask = user.UpdateUserProfileAsync(profile);
 
@@ -273,7 +282,14 @@ public class FirebaseManager : MonoBehaviour
                     DBreference.Child("users").Child(userId).Child("level").SetValueAsync(1);
                     DBreference.Child("users").Child(userId).Child("kills").SetValueAsync(0);
                     DBreference.Child("users").Child(userId).Child("deaths").SetValueAsync(0);
-                    DBreference.Child("users").Child(userId).Child("username").SetValueAsync(_email);
+                    DBreference.Child("users").Child(userId).Child("highscore").SetValueAsync(0);
+                    DBreference.Child("users").Child(userId).Child("lastLogedIn").SetValueAsync(DateTime.Now.ToString());
+                    DBreference.Child("users").Child(userId).Child("active").SetValueAsync("true");
+                    DBreference.Child("users").Child(userId).Child("username").SetValueAsync(username);
+                    DBreference.Child("users").Child(userId).Child("email").SetValueAsync(_email);
+                    DBreference.Child("users").Child(userId).Child("experience").SetValueAsync(0);
+                    DBreference.Child("levelone").Child(userId);
+                    DBreference.Child("levelone").Child(userId).Child("username").SetValueAsync(username);
 
                     //Wait until the task completes
                     yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
@@ -289,6 +305,7 @@ public class FirebaseManager : MonoBehaviour
                     {
                         //Username is now set
                         //Return to login screen
+
                         registerOutputText.text = "Successful!";
                         GameManager.instance.ChangeScene(1);
 
@@ -297,4 +314,5 @@ public class FirebaseManager : MonoBehaviour
             }
         }
     }
+
 }
