@@ -29,6 +29,7 @@ public class PlayerCharacter : MonoBehaviour
     //Database reference and variables
     DatabaseReference DBreference;
     string userId;
+    static public string username;
     static public int level;
     static public int kills;
     static public int deaths;
