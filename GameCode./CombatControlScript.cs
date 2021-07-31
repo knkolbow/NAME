@@ -14,6 +14,7 @@ public class CombatControlScript : MonoBehaviour
     EnemyCharacter enemyscript;
     PlayerCharacter playerscript;
     public bool playerturn;
+    public bool combatAI;
     
     // database reference
     string userId;
